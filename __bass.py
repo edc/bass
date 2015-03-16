@@ -28,7 +28,7 @@ def gen_script():
     old_env = dict([line.split('=', 1) for line in old_env])
     new_env = dict([line.split('=', 1) for line in new_env])
 
-    skips = ['SHLVL', 'XPC_SERVICE_NAME']
+    skips = ['PS1', 'SHLVL', 'XPC_SERVICE_NAME']
 
     with os.fdopen(fd, 'w') as f:
         for line in stdout.splitlines():

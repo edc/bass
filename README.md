@@ -23,6 +23,8 @@ Use the Makefile.
 
 `make uninstall` will remove those two files.
 
+Relaunch the shell for the change to take effect.
+
 # Example
 
 Bass is simple to use. Just prefix your bash utility command with `bass`:
