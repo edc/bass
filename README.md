@@ -82,3 +82,9 @@ mynvm> function mynvm
         v0.1.15
 ...
 ```
+
+# Caveats
+
+At the moment, Bass does not work with interactive utilities. This is not hard
+to fix, but I cannot think of a use case. File a ticket if this is something
+you find missing.
