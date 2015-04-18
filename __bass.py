@@ -49,7 +49,7 @@ def gen_script():
                     continue
             else:
                 continue
-            f.write('set -g -x %s "%s"\n' % (k, v))
+            f.write('set -g -x %s "%s"\n' % (k, v.replace('"','\"')))
 
     return name
 
