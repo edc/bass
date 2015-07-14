@@ -1,6 +1,6 @@
 # Bass
 
-Bass makes it easy to use utilities written for Bash usable in
+Bass makes it easy to use utilities written for Bash in
 [fish shell](https://github.com/fish-shell/fish-shell/).
 
 Regular bash scripts can be used in fish shell just as scripts written in any
