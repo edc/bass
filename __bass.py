@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 
+
 def gen_script():
     fd, name = tempfile.mkstemp()
 
@@ -24,13 +25,13 @@ def gen_script():
                        .check_output(['bash', '-c', command])
                        .split(divider, 1))
     new_env = new_env.lstrip().splitlines()
-    
+
     new_env = [line for line in new_env if '{' not in line and '}' not in line]
-    
+
     old_env = dict([line.split('=', 1) for line in old_env])
     new_env = dict([line.split('=', 1) for line in new_env])
 
-    skips = ['PS1', 'SHLVL', 'XPC_SERVICE_NAME', 'PATH']
+    skips = ['PS1', 'SHLVL', 'XPC_SERVICE_NAME']
 
     with os.fdopen(fd, 'w') as f:
         for line in stdout.splitlines():
@@ -49,7 +50,11 @@ def gen_script():
                     continue
             else:
                 continue
-            f.write('set -g -x %s "%s"\n' % (k, v.replace('"','\"')))
+            if k == 'PATH':
+                value = v.replace(':', ' ')
+            else:
+                value = '"%s"' % v.replace('"', '\"')
+            f.write('set -g -x %s %s\n' % (k, value))
 
     return name
 
