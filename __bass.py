@@ -7,6 +7,8 @@ To be used with a companion fish function like this:
 
 """
 
+from __future__ import print_function
+
 import os
 import subprocess
 import sys
@@ -20,8 +22,8 @@ def gen_script():
     old_env = os.popen('/bin/bash -c "env"', 'r').read().splitlines()
 
     command = '{}; echo "{}"; env'.format(' '.join(sys.argv[1:]), divider)
-    stdout, new_env = (subprocess
-                       .check_output(['bash', '-c', command])
+    stdout, new_env = (str(subprocess
+                       .check_output(['bash', '-c', command]))
                        .split(divider, 1))
     new_env = new_env.lstrip().splitlines()
 
@@ -55,6 +57,6 @@ try:
     name = gen_script()
 except Exception as e:
     sys.stderr.write(str(e) + '\n')
-    print '__error'
+    print('__error')
 else:
-    print name
+    print(name)
