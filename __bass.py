@@ -7,6 +7,7 @@ To be used with a companion fish function like this:
 
 """
 
+import json
 import os
 import subprocess
 import sys
@@ -51,9 +52,12 @@ def gen_script():
             else:
                 continue
             if k == 'PATH':
-                value = v.replace(':', ' ')
+                # use json.dumps to reliably escape quotes and backslashes
+                value = ' '.join([json.dumps(directory)
+                                  for directory in v.split(':')])
             else:
-                value = '"%s"' % v.replace('"', '\"')
+                # use json.dumps to reliably escape quotes and backslashes
+                value = json.dumps(v)
             f.write('set -g -x %s %s\n' % (k, value))
 
     return name
