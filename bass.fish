@@ -6,7 +6,8 @@ function bass
     set __bash_args $argv
   end
 
-  set -l __script (python ~/.config/fish/functions/__bass.py $__bash_args)
+  set -l __script_dir (dirname (readlink -f (status --current-filename)))
+  set -l __script (python $__script_dir/__bass.py $__bash_args)
   if test $__script = '__error'
     echo "Bass encountered an error!"
   else
