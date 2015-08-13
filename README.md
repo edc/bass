@@ -56,9 +56,7 @@ Now using io.js v1.1.0
 
 Note that semicolon is quoted to avoid being consumed by fish.
 
-This example takes advantage of the nvm bash utility to switch to iojs. This is
-a feature [not supported](https://github.com/Alex7Kom/nvm-fish/issues/20) by
-its fish counterpart, [nvm-fish](https://github.com/Alex7Kom/nvm-fish).
+This example takes advantage of the nvm bash utility to switch to iojs.
 After the command, iojs is accessible:
 
 ```
