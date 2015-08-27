@@ -10,7 +10,6 @@ To be used with a companion fish function like this:
 from __future__ import print_function
 
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -20,8 +19,6 @@ BASH = 'bash'
 
 
 def gen_script():
-    fd, name = tempfile.mkstemp()
-
     divider = '-__-__-__bass___-env-output-__bass_-__-__-__-__'
 
     args = [BASH, '-c', 'env']
@@ -41,7 +38,7 @@ def gen_script():
 
     skips = ['PS1', 'SHLVL', 'XPC_SERVICE_NAME']
 
-    with os.fdopen(fd, 'w') as f:
+    with tempfile.NamedTemporaryFile('w', delete=False) as f:
         for line in stdout.splitlines():
             f.write("printf '%s\\n'\n" % line)
         for k, v in new_env.items():
@@ -67,7 +64,7 @@ def gen_script():
                 value = json.dumps(v)
             f.write('set -g -x %s %s\n' % (k, value))
 
-    return name
+    return f.name
 
 try:
     name = gen_script()
