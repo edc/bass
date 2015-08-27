@@ -16,18 +16,21 @@ import sys
 import tempfile
 
 
+BASH = 'bash'
+
+
 def gen_script():
     fd, name = tempfile.mkstemp()
 
     divider = '-__-__-__bass___-env-output-__bass_-__-__-__-__'
 
-    old_env = os.popen('/bin/bash -c "env"', 'r').read().splitlines()
+    args = [BASH, '-c', 'env']
+    output = subprocess.check_output(args, universal_newlines=True)
+    old_env = output.splitlines()
 
     command = '{}; echo "{}"; env'.format(' '.join(sys.argv[1:]), divider)
-    output = subprocess.check_output(['bash', '-c', command])
-    if bytes != str and isinstance(output, bytes):
-        # on python 3
-        output = str(output, 'utf-8')
+    args = [BASH, '-c', command]
+    output = subprocess.check_output(args, universal_newlines=True)
     stdout, new_env = output.split(divider, 1)
     new_env = new_env.lstrip().splitlines()
 
