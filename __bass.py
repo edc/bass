@@ -10,24 +10,24 @@ To be used with a companion fish function like this:
 from __future__ import print_function
 
 import json
-import os
 import subprocess
 import sys
 import tempfile
 
 
-def gen_script():
-    fd, name = tempfile.mkstemp()
+BASH = 'bash'
 
+
+def gen_script():
     divider = '-__-__-__bass___-env-output-__bass_-__-__-__-__'
 
-    old_env = os.popen('/bin/bash -c "env"', 'r').read().splitlines()
+    args = [BASH, '-c', 'env']
+    output = subprocess.check_output(args, universal_newlines=True)
+    old_env = output.splitlines()
 
     command = '{}; echo "{}"; env'.format(' '.join(sys.argv[1:]), divider)
-    output = subprocess.check_output(['bash', '-c', command])
-    if bytes != str and isinstance(output, bytes):
-        # on python 3
-        output = str(output, 'utf-8')
+    args = [BASH, '-c', command]
+    output = subprocess.check_output(args, universal_newlines=True)
     stdout, new_env = output.split(divider, 1)
     new_env = new_env.lstrip().splitlines()
 
@@ -38,7 +38,7 @@ def gen_script():
 
     skips = ['PS1', 'SHLVL', 'XPC_SERVICE_NAME']
 
-    with os.fdopen(fd, 'w') as f:
+    with tempfile.NamedTemporaryFile('w', delete=False) as f:
         for line in stdout.splitlines():
             f.write("printf '%s\\n'\n" % line)
         for k, v in new_env.items():
@@ -64,7 +64,7 @@ def gen_script():
                 value = json.dumps(v)
             f.write('set -g -x %s %s\n' % (k, value))
 
-    return name
+    return f.name
 
 try:
     name = gen_script()
