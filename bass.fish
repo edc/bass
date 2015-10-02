@@ -10,7 +10,7 @@ function bass
   if test $__script = '__error'
     echo "Bass encountered an error!"
   else
-    source $__script
+    . $__script
     if set -q __bass_debug
       cat $__script
     end
