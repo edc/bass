@@ -17,6 +17,8 @@ by the utility of interest, and replay the changes in fish.
 
 # Installation
 
+## Manual
+
 Use the Makefile.
 
 `make install` will copy two files to `~/.config/fish/functions/`.
@@ -24,6 +26,16 @@ Use the Makefile.
 `make uninstall` will remove those two files.
 
 Relaunch the shell for the change to take effect.
+
+## Using [fundle](https://github.com/tuvistavie/fundle)
+
+Add
+
+```
+fundle plugin 'edc/bass'
+```
+
+to your fish config, relaunch you shell and run `fundle install`.
 
 # Example
 
