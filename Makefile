@@ -6,3 +6,8 @@ install:
 uninstall:
 	rm -f ~/.config/fish/functions/__bass.py
 	rm -f ~/.config/fish/functions/bass.fish
+
+test:
+	fish test/test_bass.fish
+
+.PHONY: test
