@@ -6,7 +6,13 @@ function bass
     set __bash_args $argv
   end
 
-  set -l __script (python (dirname (status -f))/__bass.py $__bash_args)
+  if not functions -q __bass_python
+    function __bass_python
+      python $argv
+    end
+  end
+
+  set -l __script (__bass_python (dirname (status -f))/__bass.py $__bash_args)
   if test $__script = '__error'
     echo "Bass encountered an error!"
   else

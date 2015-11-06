@@ -95,6 +95,19 @@ mynvm> function mynvm
 
 # Caveats
 
+## Interactive utilities
+
 At the moment, Bass does not work with interactive utilities. This is not hard
 to fix, but I cannot think of a use case. File a ticket if this is something
 you find missing.
+
+## Python 3
+
+If your `python` executable is Python 3, you will need to modify your configuration.
+Just add
+
+```
+function __bass_python; PATH_TO_PYTHON2 $argv; end
+```
+
+where `PATH_TO_PYTHON2` can be an absolute path or any executable on your path.
