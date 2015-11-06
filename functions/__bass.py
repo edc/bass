@@ -23,7 +23,7 @@ def gen_script():
 
     # Use the following instead of /usr/bin/env to read environment so we can
     # deal with multi-line environment variables (and other odd cases).
-    env_reader = "python -c 'import os,json; print json.dumps({k:v for k,v in os.environ.iteritems()})'"
+    env_reader = "python -c 'import os,json; print(json.dumps({k:v for k,v in os.environ.items()}))'"
     args = [BASH, '-c', env_reader]
     output = subprocess.check_output(args, universal_newlines=True)
     old_env = output.strip()
