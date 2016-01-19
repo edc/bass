@@ -27,6 +27,12 @@ Use the Makefile.
 
 Relaunch the shell for the change to take effect.
 
+## Using [Fisherman](https://github.com/fisherman/fisherman)
+
+```fish
+fisher install bass
+```
+
 ## Using [fundle](https://github.com/tuvistavie/fundle)
 
 Add

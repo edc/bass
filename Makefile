@@ -1,3 +1,6 @@
+all:
+	@echo "Run 'make install' to deploy bass to your function directory."
+
 install:
 	install -d ~/.config/fish/functions
 	install functions/__bass.py ~/.config/fish/functions
