@@ -67,6 +67,10 @@ def gen_script():
 
     return f.name
 
+if not sys.argv[1:]:
+    print('__usage')
+    sys.exit(0)
+
 try:
     name = gen_script()
 except Exception as e:
