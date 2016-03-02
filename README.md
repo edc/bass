@@ -87,7 +87,7 @@ You can then very easily pack the command as a function and feel more at home:
 ```
 > funced mynvm
 mynvm> function mynvm
-           bass source ~/.nvm/nvm.sh ';' nvm $argv
+           bass source ~/.nvm/nvm.sh --no-use ';' nvm $argv
        end
 
 > mynvm list
