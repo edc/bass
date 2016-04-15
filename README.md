@@ -61,7 +61,7 @@ Here is a more realistic example, using the excellent
 [nvm](https://github.com/creationix/nvm):
 
 ```
-> bass source ~/.nvm/nvm.sh ';' nvm use iojs
+> bass source ~/.nvm/nvm.sh --no-use ';' nvm use iojs
 Now using io.js v1.1.0
 ```
 
@@ -91,6 +91,8 @@ nvm> function nvm
         v0.1.15
 ...
 ```
+
+(`--no-use` is an important option to `nvm.sh`. See [#13](https://github.com/edc/bass/issues/13) for background.)
 
 # Caveats
 
