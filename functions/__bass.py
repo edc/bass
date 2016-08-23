@@ -28,7 +28,7 @@ def gen_script():
     output = subprocess.check_output(args, universal_newlines=True)
     old_env = output.strip()
 
-    command = '{}; echo "{}"; {}'.format(' '.join(sys.argv[1:]), divider, env_reader)
+    command = '{} && (echo "{}"; {})'.format(' '.join(sys.argv[1:]), divider, env_reader)
     args = [BASH, '-c', command]
     output = subprocess.check_output(args, universal_newlines=True)
     stdout, new_env = output.split(divider, 1)
@@ -74,7 +74,7 @@ if not sys.argv[1:]:
 try:
     name = gen_script()
 except Exception as e:
-    sys.stderr.write(str(e) + '\n')
+    print('exit code:', e.returncode, file=sys.stderr)
     print('__error')
 else:
     print(name)
