@@ -42,7 +42,7 @@ def gen_script():
     script_lines = []
 
     for line in stdout.splitlines():
-        script_lines.append("printf '%s\\n'" % line)
+        script_lines.append("printf %s;printf '\\n'" % json.dumps(line))
     for k, v in new_env.items():
         if k in skips:
             continue
@@ -53,7 +53,7 @@ def gen_script():
             script_lines.append('# updating %s=%s -> %s' % (k, v1, v))
             # process special variables
             if k == 'PWD':
-                script_lines.append('cd "%s"' % v)
+                script_lines.append('cd %s' % json.dumps(v))
                 continue
         else:
             continue
