@@ -4,7 +4,7 @@ Bass makes it easy to use utilities written for Bash in [fish shell](https://git
 
 Regular bash scripts can be used in fish shell just as scripts written in any language with proper shebang or explicitly using the interpreter (i.e. using `bash script.sh`). However, many utilities, such as virtualenv, modify the shell environment and need to be sourced, and therefore cannot be used in fish. Sometimes, counterparts (such as the excellent [virtualfish](http://virtualfish.readthedocs.org/en/latest/)) are created, but that's often not the case.
 
-Bass is created to make it possible to use bash uilities in fish shell without any modification. It works by capturing what environment variables are modifiedby the utility of interest, and replay the changes in fish.
+Bass is created to make it possible to use bash uilities in fish shell without any modification. It works by capturing what environment variables are modified by the utility of interest, and replay the changes in fish.
 
 # Installation
 
