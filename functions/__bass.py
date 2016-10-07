@@ -12,6 +12,7 @@ from __future__ import print_function
 import json
 import subprocess
 import sys
+import traceback
 
 
 BASH = 'bash'
@@ -73,8 +74,12 @@ if not sys.argv[1:]:
 
 try:
     script = gen_script()
-except Exception as e:
+except subprocess.CalledProcessError as e:
     print('exit code:', e.returncode, file=sys.stderr)
+    print('__error', end='')
+except Exception as e:
+    print('unknown error:', str(e), file=sys.stderr)
+    traceback.print_exc(10, file=sys.stderr)
     print('__error', end='')
 else:
     print(script, end='')
