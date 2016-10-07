@@ -28,10 +28,15 @@ def gen_script():
     output = subprocess.check_output(args, universal_newlines=True)
     old_env = output.strip()
 
-    command = '{} && (echo "{}"; {})'.format(' '.join(sys.argv[1:]), divider, env_reader)
+    command = '{} && (echo "{}"; {}; echo "{}"; alias)'.format(
+        ' '.join(sys.argv[1:]),
+        divider,
+        env_reader,
+        divider,
+    )
     args = [BASH, '-c', command]
     output = subprocess.check_output(args, universal_newlines=True)
-    stdout, new_env = output.split(divider, 1)
+    stdout, new_env, alias = output.split(divider, 2)
     new_env = new_env.strip()
 
     old_env = json.loads(old_env)
@@ -66,7 +71,8 @@ def gen_script():
             value = json.dumps(v)
         script_lines.append('set -g -x %s %s' % (k, value))
     script = '\n'.join(script_lines)
-    return script
+
+    return script + '\n' + alias
 
 if not sys.argv[1:]:
     print('__usage', end='')
