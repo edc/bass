@@ -23,7 +23,7 @@ Relaunch the shell for the change to take effect.
 ```fish
 fisher edc/bass
 ```
-You are recommened to use Fisherman > 2.0.
+You are recommended to use Fisherman > 2.0.
 
 ## Using [fundle](https://github.com/tuvistavie/fundle)
 
