@@ -12,5 +12,6 @@ uninstall:
 
 test:
 	fish test/test_bass.fish
+	fish test/test_dollar_on_output.fish
 
 .PHONY: test
