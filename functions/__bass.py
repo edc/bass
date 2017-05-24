@@ -47,6 +47,8 @@ def gen_script():
     script_lines = []
 
     for line in stdout.splitlines():
+        # some outputs might use documentation about the shell usage with dollar signs
+        line = line.replace(r'$', r'\$')
         script_lines.append("printf %s;printf '\\n'" % json.dumps(line))
     for k, v in new_env.items():
         if k in skips:
