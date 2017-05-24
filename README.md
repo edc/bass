@@ -97,4 +97,4 @@ nvm> function nvm
 
 # Caveats
 
-At the moment, Bass may or may not work with your favorite interactive utilities, such as sdkman. File a ticket if something is broken.
+At the moment, Bass may or may not work with your favorite interactive utilities, such as ssh-add. Reopen and add a comment to #14 if you encounter an issue related to that.
