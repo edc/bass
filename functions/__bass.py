@@ -72,6 +72,11 @@ def gen_script():
             # use json.dumps to reliably escape quotes and backslashes
             value = json.dumps(v)
         script_lines.append('set -g -x %s %s' % (k, value))
+
+    for var in set(old_env.keys()) - set(new_env.keys()):
+        script_lines.append('# removing %s' % var)
+        script_lines.append('set -e %s' % var)
+
     script = '\n'.join(script_lines)
 
     return script + '\n' + alias
