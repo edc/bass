@@ -42,8 +42,6 @@ def gen_script():
     old_env = json.loads(old_env)
     new_env = json.loads(new_env)
 
-    skips = ['PS1', 'SHLVL', 'XPC_SERVICE_NAME']
-
     script_lines = []
 
     for line in stdout.splitlines():
@@ -51,7 +49,7 @@ def gen_script():
         line = line.replace(r'$', r'\$')
         script_lines.append("printf %s;printf '\\n'" % json.dumps(line))
     for k, v in new_env.items():
-        if k in skips:
+        if k in ['PS1', 'SHLVL', 'XPC_SERVICE_NAME'] or k.startswith("BASH_FUNC"):
             continue
         v1 = old_env.get(k)
         if not v1:
