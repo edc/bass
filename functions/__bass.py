@@ -17,6 +17,8 @@ import traceback
 
 BASH = 'bash'
 
+def comment(string):
+    return '\n'.join(['# ' + line for line in string.split('\n')])
 
 def gen_script():
     divider = '-__-__-__bass___-env-output-__bass_-__-__-__-__'
@@ -53,9 +55,9 @@ def gen_script():
             continue
         v1 = old_env.get(k)
         if not v1:
-            script_lines.append('# adding %s=%s' % (k, v))
+            script_lines.append(comment('adding %s=%s' % (k, v)))
         elif v1 != v:
-            script_lines.append('# updating %s=%s -> %s' % (k, v1, v))
+            script_lines.append(comment('updating %s=%s -> %s' % (k, v1, v)))
             # process special variables
             if k == 'PWD':
                 script_lines.append('cd %s' % json.dumps(v))
@@ -72,7 +74,7 @@ def gen_script():
         script_lines.append('set -g -x %s %s' % (k, value))
 
     for var in set(old_env.keys()) - set(new_env.keys()):
-        script_lines.append('# removing %s' % var)
+        script_lines.append(comment('removing %s' % var))
         script_lines.append('set -e %s' % var)
 
     script = '\n'.join(script_lines)
