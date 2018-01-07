@@ -10,6 +10,7 @@ function bass
     echo "Usage: bass [-d] <bash-command>"
   else if test "$__script" = '__error'
     echo "Bass encountered an error!"
+    return 1
   else
     echo -e "$__script" | source -
     if set -q __bass_debug
