@@ -8,6 +8,8 @@ Bass is created to make it possible to use bash uilities in fish shell without a
 
 # Installation
 
+Bass is compatible with fish versions 2.6.0 and later.
+
 ## Manual
 
 Use the Makefile.
