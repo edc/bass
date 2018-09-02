@@ -37,6 +37,12 @@ fundle plugin 'edc/bass'
 
 to your fish config, relaunch the shell and run `fundle install`.
 
+## Using [Oh My Fish](https://github.com/oh-my-fish/oh-my-fish)
+
+```fish
+omf install bass
+```
+
 # Example
 
 Bass is simple to use. Just prefix your bash utility command with `bass`:
