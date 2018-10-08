@@ -20,14 +20,13 @@ Use the Makefile.
 
 Relaunch the shell for the change to take effect.
 
-## Using [Fisherman](https://github.com/fisherman/fisherman)
+## Using [Fisher](https://github.com/jorgebucaran/fisher)
 
 ```fish
-fisher edc/bass
+fisher add edc/bass
 ```
-You are recommended to use Fisherman > 2.0.
 
-## Using [fundle](https://github.com/tuvistavie/fundle)
+## Using [Fundle](https://github.com/tuvistavie/fundle)
 
 Add
 
