@@ -31,7 +31,7 @@ def gen_script():
     old_env = output.strip()
 
     command = '{} && (echo "{}"; {}; echo "{}"; alias)'.format(
-        ' '.join(sys.argv[1:]),
+        ' '.join(sys.argv[1:]).rstrip().rstrip(';'),
         divider,
         env_reader,
         divider,
