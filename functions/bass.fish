@@ -8,9 +8,15 @@ function bass
   python (dirname (status -f))/__bass.py $__bash_args | read -z __script
   if test "$__script" = '__usage'
     echo "Usage: bass [-d] <bash-command>"
-  else if test "$__script" = '__error'
+  else if test (string sub -s 1 -l 7 "$__script") = '__error'
     echo "Bass encountered an error!"
-    return 1
+    set __exitcode (string sub -s 9 "$__script")
+    set __exitcode (string trim $__exitcode)
+    if test -z $__exitcode
+      return 1
+    else
+      return $__exitcode
+    end
   else
     echo -e "$__script" | source -
     if set -q __bass_debug
