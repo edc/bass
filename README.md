@@ -1,5 +1,7 @@
 # Bass
 
+![](https://travis-ci.org/edc/bass.svg?branch=master)
+
 Bass makes it easy to use utilities written for Bash in [fish shell](https://github.com/fish-shell/fish-shell/).
 
 Regular bash scripts can be used in fish shell just as scripts written in any language with proper shebang or explicitly using the interpreter (i.e. using `bash script.sh`). However, many utilities, such as virtualenv, modify the shell environment and need to be sourced, and therefore cannot be used in fish. Sometimes, counterparts (such as the excellent [virtualfish](http://virtualfish.readthedocs.org/en/latest/)) are created, but that's often not the case.
