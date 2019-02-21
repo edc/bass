@@ -8,7 +8,7 @@ Regular bash scripts can be used in fish shell just as scripts written in any la
 
 Bass is created to make it possible to use bash uilities in fish shell without any modification. It works by capturing what environment variables are modified by the utility of interest, and replay the changes in fish.
 
-You might not need Bass for simple use cases. A great simple alternative (suggested by @jorgebucaran) is to just use `$ exec bash -c "source some-bash-setup.sh; exec fish"`.
+You might not need Bass for simple use cases. A great simple alternative (suggested by @jorgebucaran) is to just use `exec bash -c "source some-bash-setup.sh; exec fish"`.
 
 # Installation
 
