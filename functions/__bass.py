@@ -34,7 +34,7 @@ def gen_script():
     output = subprocess.check_output(args, universal_newlines=True)
     old_env = output.strip()
 
-    command = '{} && (echo "{}"; {}; echo "{}"; alias)'.format(
+    command = '{}\n(echo "{}"; {}; echo "{}"; alias)'.format(
         ' '.join(sys.argv[1:]).rstrip().rstrip(';'),
         divider,
         env_reader,
