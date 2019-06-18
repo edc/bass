@@ -36,12 +36,11 @@ def gen_script():
     pipe_r, pipe_w = os.pipe()
     if sys.version_info >= (3, 4):
       os.set_inheritable(pipe_w, True)
-    command = '{}\n({}; alias) >&{}'.format(
-        ' '.join(sys.argv[1:]).rstrip().rstrip(';'),
+    command = 'eval $1 && ({}; alias) >&{}'.format(
         env_reader,
         pipe_w
     )
-    args = [BASH, '-c', command]
+    args = [BASH, '-c', command, 'bass', ' '.join(sys.argv[1:])]
     subprocess.check_call(args, universal_newlines=True, close_fds=False)
     os.close(pipe_w)
     with os.fdopen(pipe_r) as f:
