@@ -11,6 +11,7 @@ from __future__ import print_function
 
 import json
 import os
+import signal
 import subprocess
 import sys
 import traceback
@@ -95,5 +96,8 @@ except subprocess.CalledProcessError as e:
 except Exception:
     print('Bass internal error!', file=sys.stderr)
     raise # traceback will output to stderr
+except KeyboardInterrupt:
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    os.kill(os.getpid(), signal.SIGINT)
 else:
     script_file.write(script)
