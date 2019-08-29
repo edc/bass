@@ -17,7 +17,7 @@ function bass
     cat $script_file
   end
   source $script_file
-  rm $script_file
+  /bin/rm $script_file
 end
 
 function __bass_usage
