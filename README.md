@@ -105,7 +105,3 @@ nvm> function nvm
 ```
 
 (`--no-use` is an important option to `nvm.sh`. See [#13](https://github.com/edc/bass/issues/13) for background.)
-
-# Caveats
-
-At the moment, Bass may or may not work with your favorite interactive utilities, such as ssh-add. Reopen and add a comment to [#14](https://github.com/edc/bass/issues/14) if you encounter an issue related to that.
