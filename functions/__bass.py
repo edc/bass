@@ -19,6 +19,25 @@ import traceback
 
 BASH = 'bash'
 
+FISH_READONLY = [
+    'PWD', 'SHLVL', 'history', 'pipestatus', 'status', 'version',
+    'FISH_VERSION', 'fish_pid', 'hostname', '_', 'fish_private_mode'
+]
+
+IGNORED = [
+ 'PS1', 'XPC_SERVICE_NAME'
+]
+
+def ignored(name):
+    if name == 'PWD':  # this is read only, but has special handling
+        return False
+    # ignore other read only variables
+    if name in FISH_READONLY:
+        return True
+    if name in IGNORED or name.startswith("BASH_FUNC"):
+        return True
+    return False
+
 def escape(string):
     # use json.dumps to reliably escape quotes and backslashes
     return json.dumps(string).replace(r'$', r'\$')
@@ -55,7 +74,7 @@ def gen_script():
     script_lines = []
 
     for k, v in new_env.items():
-        if k in ['PS1', 'SHLVL', 'XPC_SERVICE_NAME'] or k.startswith("BASH_FUNC"):
+        if ignored(k):
             continue
         v1 = old_env.get(k)
         if not v1:
