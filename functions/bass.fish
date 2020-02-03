@@ -7,7 +7,11 @@ function bass
   end
 
   set -l script_file (mktemp)
-  python (dirname (status -f))/__bass.py $bash_args 3>$script_file
+  set -l python "python"
+  if command -v python3 >/dev/null 2>&1
+      set python "python3"
+  end
+  command $python (dirname (status -f))/__bass.py $bash_args 3>$script_file
   set -l bass_status $status
   if test $bass_status -ne 0
     return $bass_status
@@ -17,7 +21,7 @@ function bass
     cat $script_file
   end
   source $script_file
-  /bin/rm $script_file
+  command rm $script_file
 end
 
 function __bass_usage
