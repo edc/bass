@@ -61,7 +61,7 @@ def gen_script():
         pipe_w
     )
     args = [BASH, '-c', command, 'bass', ' '.join(sys.argv[1:])]
-    subprocess.check_call(args, universal_newlines=True, close_fds=False)
+    subprocess.Popen(args, universal_newlines=True, close_fds=False)
     os.close(pipe_w)
     with os.fdopen(pipe_r) as f:
         new_env = f.readline()
