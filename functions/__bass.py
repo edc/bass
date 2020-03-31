@@ -61,11 +61,17 @@ def gen_script():
         pipe_w
     )
     args = [BASH, '-c', command, 'bass', ' '.join(sys.argv[1:])]
-    subprocess.Popen(args, universal_newlines=True, close_fds=False)
+    p = subprocess.Popen(args, universal_newlines=True, close_fds=False)
     os.close(pipe_w)
     with os.fdopen(pipe_r) as f:
         new_env = f.readline()
         alias = f.read()
+    if p.wait() != 0:
+        raise subprocess.CalledProcessError(
+            returncode=p.returncode,
+            cmd=' '.join(sys.argv[1:]),
+            output=new_env + alias
+        )
     new_env = new_env.strip()
 
     old_env = json.loads(old_env)
