@@ -14,7 +14,29 @@ You might not need Bass for simple use cases. A great simple alternative (sugges
 
 Bass is compatible with fish versions 2.6.0 and later.
 
-## Manual
+## With [Fisher](https://github.com/jorgebucaran/fisher)
+
+```console
+fisher install edc/bass
+```
+
+## With [Fundle](https://github.com/tuvistavie/fundle)
+
+Add
+
+```console
+fundle plugin 'edc/bass'
+```
+
+to your fish config, relaunch the shell and run `fundle install`.
+
+## With [Oh My Fish](https://github.com/oh-my-fish/oh-my-fish)
+
+```console
+omf install bass
+```
+
+## Manually
 
 Use the Makefile.
 
@@ -23,28 +45,6 @@ Use the Makefile.
 `make uninstall` will remove those two files.
 
 Relaunch the shell for the change to take effect.
-
-## Using [Fisher](https://github.com/jorgebucaran/fisher)
-
-```fish
-fisher add edc/bass
-```
-
-## Using [Fundle](https://github.com/tuvistavie/fundle)
-
-Add
-
-```
-fundle plugin 'edc/bass'
-```
-
-to your fish config, relaunch the shell and run `fundle install`.
-
-## Using [Oh My Fish](https://github.com/oh-my-fish/oh-my-fish)
-
-```fish
-omf install bass
-```
 
 # Example
 
