@@ -34,7 +34,7 @@ omf install bass
 ## With [Fisher](https://github.com/jorgebucaran/fisher)
 
 ```console
-fisher install edc/bass
+fisher add edc/bass
 ```
 
 ## With [Fundle](https://github.com/tuvistavie/fundle)
