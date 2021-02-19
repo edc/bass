@@ -8,9 +8,9 @@ function bass
 
   set -l script_file (mktemp)
   if command -v python3 >/dev/null 2>&1
-    command python3 (dirname (status -f))/__bass.py $bash_args 3>$script_file
+    command python3 -sS (dirname (status -f))/__bass.py $bash_args 3>$script_file
   else
-    command python (dirname (status -f))/__bass.py $bash_args 3>$script_file
+    command python -sS (dirname (status -f))/__bass.py $bash_args 3>$script_file
   end
   set -l bass_status $status
   if test $bass_status -ne 0
