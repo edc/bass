@@ -102,6 +102,8 @@ nvm> function nvm
 > nvm ls-remote
         v0.1.14
         v0.1.15
+        
+> funcsave nvm
 ...
 ```
 
