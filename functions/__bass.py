@@ -120,6 +120,10 @@ def gen_script():
 
     return script + '\n' + alias
 
+# Ignore ctrl-c in the parent process, to avoid having the parent exit before
+# the child. It will still affect the child process.
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+
 script_file = os.fdopen(3, 'w')
 
 if not sys.argv[1:]:
@@ -133,8 +137,5 @@ except subprocess.CalledProcessError as e:
 except Exception:
     print('Bass internal error!', file=sys.stderr)
     raise # traceback will output to stderr
-except KeyboardInterrupt:
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    os.kill(os.getpid(), signal.SIGINT)
 else:
     script_file.write(script)
