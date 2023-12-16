@@ -6,12 +6,18 @@ function bass
     set -e bash_args[1]
   end
 
-  set -l script_file (mktemp)
-  if command -v python3 >/dev/null 2>&1
-    command python3 -sS (dirname (status -f))/__bass.py $bash_args 3>$script_file
-  else
-    command python -sS (dirname (status -f))/__bass.py $bash_args 3>$script_file
+  if not set -q __bass_state_file
+    set -g __bass_state_file (mktemp)
   end
+
+  set -l script_file (mktemp)
+  set -l python
+  if command -v python3 >/dev/null 2>&1
+    set python python3
+  else
+    set python python
+  end
+  command $python -u -sS (dirname (status -f))/__bass.py $__bass_state_file $bash_args 3>$script_file
   set -l bass_status $status
   if test $bass_status -ne 0
     return $bass_status
@@ -26,4 +32,10 @@ end
 
 function __bass_usage
   echo "Usage: bass [-d] <bash-command>"
+end
+
+function __bass_cleanup --on-event fish_exit
+  if set -q __bass_state_file
+    command rm $__bass_state_file
+  end
 end

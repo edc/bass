@@ -14,117 +14,209 @@ import os
 import signal
 import subprocess
 import sys
+import tempfile
 import traceback
 
 
 BASH = 'bash'
 
+SCRIPT_FD = 3
+STATE_LOAD_FD = 4
+
 FISH_READONLY = [
-    'PWD', 'SHLVL', 'history', 'pipestatus', 'status', 'version',
-    'FISH_VERSION', 'fish_pid', 'hostname', '_', 'fish_private_mode'
+    b'PWD', b'SHLVL', b'history', b'pipestatus', b'status', b'version',
+    b'FISH_VERSION', b'fish_pid', b'hostname', b'_', b'fish_private_mode'
 ]
 
 IGNORED = [
- 'PS1', 'XPC_SERVICE_NAME'
+    b'PS1', b'XPC_SERVICE_NAME'
 ]
 
 def ignored(name):
-    if name == 'PWD':  # this is read only, but has special handling
+    if name == b'PWD':  # this is read only, but has special handling
         return False
     # ignore other read only variables
     if name in FISH_READONLY:
         return True
-    if name in IGNORED or name.startswith("BASH_FUNC"):
+    if name in IGNORED or name.startswith(b"BASH_FUNC"):
         return True
-    if name.startswith('%'):
+    if name.startswith(b'%'):
         return True
     return False
 
 def escape(string):
-    # use json.dumps to reliably escape quotes and backslashes
-    return json.dumps(string).replace(r'$', r'\$')
-
-def escape_identifier(word):
-    return escape(word.replace('?', '\\?'))
+    return ''.join('\\x{:02x}'.format(b) for b in string).encode()
 
 def comment(string):
-    return '\n'.join(['# ' + line for line in string.split('\n')])
+    return b'\n'.join([b'# ' + line for line in string.split(b'\n')])
+
+def load_env(env_json):
+    env = json.loads(env_json)
+    def env_encode(env_str):
+        # https://docs.python.org/3/library/os.html#file-names-command-line-arguments-and-environment-variables
+        return env_str.encode(sys.getfilesystemencoding(), 'surrogateescape')
+    return {env_encode(k): env_encode(v) for k, v in env.items()}
+
+def load_state(state):
+    lines = iter(state.splitlines())
+    bash_state = []
+    function_source = b''
+    try:
+        while True:
+            item = next(lines)
+            # stop as soon as we get to the function source
+            if item.endswith(b' () '):
+                function_source += item + b'\n'
+                break
+            if item.startswith(b'declare '):
+                kind, flags, var = item.split(b' ', 2)
+                var = var.partition(b'=')[0]
+                # skip environment variables
+                if b'x' in flags:
+                    continue
+                # skip bash preinitialized readonly variables
+                if var in [b'BASHOPTS', b'BASH_VERSINFO', b'EUID', b'PPID', b'SHELLOPTS', b'UID']:
+                    continue
+            bash_state.append(item)
+        # the rest is function source, don't try to parse it
+        while True:
+            function_source += next(lines) + b'\n'
+    except StopIteration:
+        pass
+    return bash_state, function_source
+
+def parse_aliases(bash_state):
+    aliases = {}
+    for line in bash_state:
+        command, rest = line.split(b' ', 1)
+        if command != b'alias':
+            continue
+        k, _, v = rest.partition(b'=')
+        aliases[k] = v
+    return aliases
+
+def parse_functions(bash_state):
+    functions = set()
+    for line in bash_state:
+        #print(line)
+        command, rest = line.split(b' ', 1)
+        if command != b'declare':
+            continue
+        flags, name = rest.split(b' ', 1)
+        if b'f' not in flags:
+            continue
+        functions.add(name)
+    return functions
 
 def gen_script():
+    # Load initial environment and bash state.
+    old_env = dict(os.environb)
+    state_file = sys.argv[1]
+    with open(state_file, 'rb') as f:
+        old_bash_state = f.read()
+        parse_aliases(load_state(old_bash_state)[0])
+
     # Use the following instead of /usr/bin/env to read environment so we can
     # deal with multi-line environment variables (and other odd cases).
-    env_reader = "%s -c 'import os,json; print(json.dumps({k:v for k,v in os.environ.items()}))'" % (sys.executable)
-    args = [BASH, '-c', env_reader]
-    output = subprocess.check_output(args, universal_newlines=True)
-    old_env = output.strip()
+    env_reader = "%s -c 'import os,json; print(json.dumps(dict(os.environ)))'" % (sys.executable)
 
-    pipe_r, pipe_w = os.pipe()
-    if sys.version_info >= (3, 4):
-      os.set_inheritable(pipe_w, True)
-    command = 'eval $1 && ({}; alias) >&{}'.format(
-        env_reader,
-        pipe_w
+    state_save_r, state_save_w = os.pipe()
+    command = 'source "{state_file}"; eval "$@" {state_save}>&- && {{ {env_reader}; alias -p; declare -p; declare -F; complete -p; declare -f; }} >&{state_save}'.format(
+        env_reader=env_reader,
+        state_file=state_file,
+        state_save=state_save_w
     )
-    args = [BASH, '-c', command, 'bass', ' '.join(sys.argv[1:])]
-    p = subprocess.Popen(args, universal_newlines=True, close_fds=False)
-    os.close(pipe_w)
-    with os.fdopen(pipe_r) as f:
+    args = [BASH, '--norc', '--noprofile', '-c', command, 'bass'] + sys.argv[2:]
+    p = subprocess.Popen(args, pass_fds=[state_save_w])
+    os.close(state_save_w)
+    with os.fdopen(state_save_r, 'rb') as f:
         new_env = f.readline()
-        alias_str = f.read()
+        new_bash_state = f.read()
     if p.wait() != 0:
-        raise subprocess.CalledProcessError(
-            returncode=p.returncode,
-            cmd=' '.join(sys.argv[1:]),
-            output=new_env + alias_str
-        )
-    new_env = new_env.strip()
+        raise subprocess.CalledProcessError(p.returncode, p.args)
 
-    old_env = json.loads(old_env)
-    new_env = json.loads(new_env)
+    new_env = load_env(new_env)
+    old_bash_state, _ = load_state(old_bash_state)
+    new_bash_state, function_source = load_state(new_bash_state)
+
+    # save the bash internal state in this variable so we can immediately resurrect it next time
+    saved_bash_state = b''
+    for line in new_bash_state:
+        saved_bash_state += line + b'\n'
+    saved_bash_state += function_source
+    with open(state_file, 'wb') as f:
+        f.write(saved_bash_state)
 
     script_lines = []
 
+    # env vars
     for k, v in new_env.items():
         if ignored(k):
             continue
         v1 = old_env.get(k)
         if not v1:
-            script_lines.append(comment('adding %s=%s' % (k, v)))
+            script_lines.append(comment(b'adding %s=%s' % (k, v)))
         elif v1 != v:
-            script_lines.append(comment('updating %s=%s -> %s' % (k, v1, v)))
+            script_lines.append(comment(b'updating %s=%s -> %s' % (k, v1, v)))
             # process special variables
-            if k == 'PWD':
-                script_lines.append('cd %s' % escape(v))
+            if k == b'PWD':
+                script_lines.append(b'cd %s' % escape(v))
                 continue
         else:
             continue
-        if k == 'PATH':
-            value = ' '.join([escape(directory)
-                              for directory in v.split(':')])
+        if k == b'PATH':
+            value = b' '.join([escape(directory)
+                              for directory in v.split(b':')])
         else:
             value = escape(v)
-        script_lines.append('set -g -x %s %s' % (k, value))
+        script_lines.append(b'set -g -x %s %s' % (escape(k), value))
 
     for var in set(old_env.keys()) - set(new_env.keys()):
-        script_lines.append(comment('removing %s' % var))
-        script_lines.append('set -e %s' % var)
+        script_lines.append(comment(b'removing %s' % var))
+        script_lines.append(b'set -e %s' % escape(var))
 
-    script = '\n'.join(script_lines)
+    # aliases
+    old_aliases = parse_aliases(old_bash_state)
+    new_aliases = parse_aliases(new_bash_state)
 
-    alias_lines = []
-    for line in alias_str.splitlines():
-        _, rest = line.split(None, 1)
-        k, v = rest.split("=", 1)
-        alias_lines.append("alias " + escape_identifier(k) + "=" + v)
-    alias = '\n'.join(alias_lines)
+    for k, v in new_aliases.items():
+        v1 = old_aliases.get(k)
+        if not v1:
+            script_lines.append(comment(b'adding alias %s=%s' % (k, v)))
+        elif v1 != v:
+            script_lines.append(comment(b'updating alias %s=%s -> %s' % (k, v1, v)))
+        else:
+            continue
+        script_lines.append(b'alias %s %s' % (k, v))
 
-    return script + '\n' + alias
+    for alias in set(old_aliases.keys()) - set(new_aliases.keys()):
+        script_lines.append(comment(b'removing alias %s' % alias))
+        script_lines.append(b'functions -e %s' % escape(alias))
 
-script_file = os.fdopen(3, 'w')
+    # functions
+    old_functions = parse_functions(old_bash_state)
+    new_functions = parse_functions(new_bash_state)
+    #print(old_functions, new_functions)
+    for function in old_functions - new_functions:
+        script_lines.append(comment(b'removing function %s' % function))
+        script_lines.append(b'function -e %s' % escape(function))
+    for function in new_functions - old_functions:
+        script_lines.append(comment(b'adding function %s' % function))
+        script_lines.append(b'function %s; bass %s $argv; return $status; end' % (escape(function), escape(function)))
+
+    script = b'\n'.join(script_lines)
+
+    return script
+
+script_file = os.fdopen(SCRIPT_FD, 'wb')
 
 if not sys.argv[1:]:
-    print('__bass_usage', file=script_file, end='')
+    script_file.write(b'__bass_usage')
     sys.exit(0)
+
+# Ignore ctrl-c in the parent process, to avoid having the parent exit before
+# the child. It will still affect the child process.
+signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 try:
     script = gen_script()
@@ -133,8 +225,5 @@ except subprocess.CalledProcessError as e:
 except Exception:
     print('Bass internal error!', file=sys.stderr)
     raise # traceback will output to stderr
-except KeyboardInterrupt:
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    os.kill(os.getpid(), signal.SIGINT)
 else:
     script_file.write(script)
